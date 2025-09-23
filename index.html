@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EarnApp</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        :root {
+            --primary-dark: #0f0f23;
+            --secondary-dark: #1a1a2e;
+            --accent-dark: #16213e;
+            --accent-blue: #667eea;
+            --accent-purple: #764ba2;
+            --accent-pink: #f093fb;
+            --text-primary: #ffffff;
+            --text-secondary: #a9aed1;
+            --gold: #FFD700;
+            --card-bg: rgba(26, 26, 46, 0.7);
+            --card-border: rgba(255, 255, 255, 0.15);
+            --nav-height: 70px;
+        }
+
+        @keyframes gradient-animation {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        body {
+            background: linear-gradient(-45deg, var(--primary-dark), var(--accent-dark), var(--secondary-dark), var(--accent-purple));
+            background-size: 400% 400%;
+            animation: gradient-animation 15s ease infinite;
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .app-container {
+            max-width: 480px;
+            margin: 0 auto;
+            min-height: 100vh;
+            position: relative;
+            box-shadow: 0 0 60px rgba(0, 0, 0, 0.6);
+            background: rgba(0,0,0,0.1);
+        }
+
+        /* Header Styles */
+        header {
+            padding: 50px 20px 20px;
+            background: rgba(15, 15, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .header-icons {
+            display: flex;
+            gap: 15px;
+        }
+
+        .icon-btn {
+            background: rgba(255, 255, 255, 0.05);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .icon-btn:hover {
+            color: var(--accent-blue);
+            border-color: var(--accent-blue);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Main Content Area */
+        .main-content {
+            padding: 20px;
+            padding-bottom: 90px; /* Space for bottom nav */
+        }
+
+        .section-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            font-weight: 700;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+        
+        /* By default, hide all sections inside main-content */
+        .main-content > section {
+            display: none;
+        }
+        
+        /* Only show the section that has the 'active-section' class */
+        .main-content > section.active-section {
+            display: block;
+        }
+
+        /* Categories */
+        .categories {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+        .categories::-webkit-scrollbar {
+            display: none; /* Chrome, Safari and Opera */
+        }
+
+        .category-btn {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-secondary);
+            font-size: 14px;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .category-btn.active, .category-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            color: var(--text-primary);
+            border-color: var(--accent-blue);
+        }
+
+        /* Cards */
+        .cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            animation: fadeInUp 0.5s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+            border-color: var(--accent-blue);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 18px;
+            font-weight: 600;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        .reward-badge {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 5px 10px;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 215, 0, 0.3);
+        }
+
+        .reward-badge i {
+            color: var(--gold);
+            margin-right: 5px;
+        }
+
+        .reward-text {
+            color: var(--gold);
+            font-weight: 600;
+        }
+
+        .card-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .detail-item {
+            display: flex;
+            align-items: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .detail-item i {
+            margin-right: 5px;
+        }
+
+        .stars {
+            display: flex;
+            margin-right: 5px;
+        }
+
+        .stars i {
+            color: var(--gold);
+            font-size: 14px;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .category-tag {
+            padding: 5px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            background: rgba(102, 126, 234, 0.2);
+            color: var(--text-secondary);
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+
+        /* Profile Section */
+        .user-card {
+            background: var(--card-bg);
+            border-radius: 16px;
+            padding: 20px;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+            margin-bottom: 25px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+        }
+
+        .avatar i {
+            font-size: 28px;
+            color: var(--text-primary);
+        }
+
+        .user-details h2 {
+            font-size: 20px;
+            margin-bottom: 5px;
+        }
+
+        .user-details p {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .balance-section {
+            margin-bottom: 20px;
+        }
+
+        .balance-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .balance-amount {
+            display: flex;
+            align-items: center;
+        }
+
+        .balance-amount i {
+            color: var(--gold);
+            font-size: 24px;
+            margin-right: 10px;
+        }
+
+        .balance-text {
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--gold);
+        }
+
+        .history-container {
+            background: var(--card-bg);
+            border-radius: 16px;
+            overflow: hidden;
+            border: 1px solid var(--card-border);
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-info {
+            flex: 1;
+        }
+
+        .history-description {
+            font-size: 16px;
+            margin-bottom: 5px;
+        }
+
+        .history-date {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .history-amount {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .earned {
+            color: #4CAF50;
+        }
+
+        .withdrawn {
+            color: #F44336;
+        }
+
+        /* Offers Section */
+        .offer-action {
+            color: var(--text-secondary);
+            font-size: 14px;
+            flex: 1;
+            margin-right: 10px;
+        }
+
+        /* Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            max-width: 480px;
+            margin: 0 auto;
+            display: flex;
+            background: rgba(15, 15, 35, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid var(--card-border);
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 12px 0;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .nav-item::before {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 3px;
+            border-radius: 2px;
+            background-color: var(--accent-blue);
+            transition: width 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: var(--accent-blue);
+        }
+
+        .nav-item.active::before {
+            width: 40%;
+        }
+
+        .nav-item i {
+            font-size: 20px;
+            margin-bottom: 5px;
+            transition: transform 0.3s ease;
+        }
+        
+        .nav-item.active i {
+            transform: scale(1.1);
+        }
+
+        .nav-text {
+            font-size: 12px;
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-content {
+            width: 85%;
+            max-width: 400px;
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 20px;
+            padding: 25px;
+            border: 1px solid var(--card-border);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            animation: modalAppear 0.3s ease;
+            position: relative;
+        }
+
+        @keyframes modalAppear {
+            from {
+                opacity: 0;
+                transform: scale(0.9) translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            color: var(--text-secondary);
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--accent-blue);
+        }
+
+        .modal-title {
+            font-size: 22px;
+            margin-bottom: 15px;
+            text-align: center;
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+        }
+
+        .modal-text {
+            color: var(--text-secondary);
+            line-height: 1.6;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-btn {
+            flex: 1;
+            padding: 12px;
+            border-radius: 12px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .modal-btn.primary {
+            background: linear-gradient(45deg, var(--accent-blue), var(--accent-purple));
+            color: white;
+        }
+         .modal-btn.primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .modal-btn.secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+            border: 1px solid var(--card-border);
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="header-content">
+                <div class="logo">EarnApp</div>
+                <div class="header-icons">
+                    <div class="icon-btn">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="main-content">
+            <section id="surveys" class="active-section">
+                <h1 class="section-title">Available Surveys</h1>
+                
+                <div class="categories">
+                    <div class="category-btn active" data-category="all">All</div>
+                    <div class="category-btn" data-category="technology">Technology</div>
+                    <div class="category-btn" data-category="health">Health</div>
+                    <div class="category-btn" data-category="shopping">Shopping</div>
+                    <div class="category-btn" data-category="entertainment">Entertainment</div>
+                </div>
+                
+                <div class="cards-container" id="surveys-container">
+                    </div>
+            </section>
+
+            <section id="offers">
+                <h1 class="section-title">Special Offers</h1>
+                
+                <div class="cards-container" id="offers-container">
+                    </div>
+            </section>
+
+            <section id="profile">
+                <h1 class="section-title">My Profile</h1>
+                
+                <div class="user-card">
+                    <div class="user-info">
+                        <div class="avatar">
+                            <i class="fas fa-user"></i>
+                        </div>
+                        <div class="user-details">
+                            <h2>Name</h2>
+                            <p>name@example.com</p>
+                        </div>
+                    </div>
+                    
+                    <div class="balance-section">
+                        <div class="balance-label">Total Earnings</div>
+                        <div class="balance-amount">
+                            <i class="fas fa-coins"></i>
+                            <span class="balance-text" id="balance-amount">100</span>
+                        </div>
+                    </div>
+                    
+                    <button class="btn" id="withdraw-btn">Withdraw Earnings</button>
+                </div>
+                
+                <h3 class="section-title">Transaction History</h3>
+                
+                <div class="history-container" id="history-container">
+                    </div>
+            </section>
+        </div>
+
+        <nav class="bottom-nav">
+            <div class="nav-item active" data-section="surveys">
+                <i class="fas fa-clipboard-list"></i>
+                <span class="nav-text">Surveys</span>
+            </div>
+            <div class="nav-item" data-section="offers">
+                <i class="fas fa-gift"></i>
+                <span class="nav-text">Offers</span>
+            </div>
+            <div class="nav-item" data-section="profile">
+                <i class="fas fa-user"></i>
+                <span class="nav-text">Profile</span>
+            </div>
+        </nav>
+        
+        <div class="modal" id="modal">
+            <div class="modal-content">
+                <span class="modal-close" id="modal-close">&times;</span>
+                <h2 class="modal-title" id="modal-title">Survey Demo</h2>
+                <p class="modal-text" id="modal-text">
+                    This is a preview of the survey experience. In the full version, 
+                    you would answer questions and earn rewards upon completion.
+                </p>
+                <div class="modal-buttons">
+                    <button class="modal-btn primary" id="modal-action">Continue</button>
+                    <button class="modal-btn secondary" id="modal-cancel">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sample data
+        const surveyData = [
+            { id: 1, title: 'Consumer Tech Preferences', reward: 250, time: '15 min', rating: 4.7, category: 'technology' },
+            { id: 2, title: 'Health & Wellness Survey', reward: 180, time: '10 min', rating: 4.5, category: 'health' },
+            { id: 3, title: 'Shopping Habits Study', reward: 300, time: '20 min', rating: 4.8, category: 'shopping' },
+            { id: 4, title: 'Entertainment Preferences', reward: 200, time: '12 min', rating: 4.6, category: 'entertainment' },
+            { id: 5, title: 'Mobile Banking Experience', reward: 220, time: '14 min', rating: 4.4, category: 'technology' },
+            { id: 6, title: 'Fitness App Feedback', reward: 170, time: '8 min', rating: 4.3, category: 'health' }
+        ];
+
+        const offerData = [
+            { id: 1, title: 'Install Finance App', reward: 500, action: 'install' },
+            { id: 2, title: 'Register on Shopping Platform', reward: 800, action: 'register' },
+            { id: 3, title: 'Complete Gaming Tutorial', reward: 350, action: 'complete' },
+            { id: 4, title: 'Subscribe to Streaming Service', reward: 600, action: 'subscribe' }
+        ];
+
+        let transactionHistory = [
+            { id: 1, type: 'earned', amount: 250, description: 'Tech Survey', date: '2023-10-15' },
+            { id: 2, type: 'earned', amount: 180, description: 'Health Survey', date: '2023-10-14' },
+            { id: 3, type: 'withdrawn', amount: 100, description: 'Cash Out', date: '2023-10-10' },
+            { id: 4, type: 'earned', amount: 300, description: 'Shopping Survey', date: '2023-10-08' },
+            { id: 5, type: 'earned', amount: 500, description: 'App Installation', date: '2023-10-05' }
+        ];
+
+        // DOM Elements
+        const navItems = document.querySelectorAll('.nav-item');
+        const sections = document.querySelectorAll('.main-content > section');
+        const categoryButtons = document.querySelectorAll('.category-btn');
+        const modal = document.getElementById('modal');
+        const modalClose = document.getElementById('modal-close');
+        const modalCancel = document.getElementById('modal-cancel');
+        const withdrawBtn = document.getElementById('withdraw-btn');
+        const balanceAmount = document.getElementById('balance-amount');
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', function() {
+            renderSurveys('all');
+            renderOffers();
+            renderHistory();
+            updateBalance();
+            setupEventListeners();
+        });
+
+        // Set up event listeners
+        function setupEventListeners() {
+            // Navigation
+            navItems.forEach(item => {
+                item.addEventListener('click', function() {
+                    const targetSectionId = this.getAttribute('data-section');
+                    
+                    // Update active nav item
+                    navItems.forEach(nav => nav.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    // Show corresponding section
+                    sections.forEach(section => {
+                        section.classList.remove('active-section');
+                        if (section.id === targetSectionId) {
+                            section.classList.add('active-section');
+                        }
+                    });
+                });
+            });
+
+            // Category filters
+            categoryButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    categoryButtons.forEach(btn => btn.classList.remove('active'));
+                    this.classList.add('active');
+                    
+                    const category = this.getAttribute('data-category');
+                    renderSurveys(category);
+                });
+            });
+
+            // Modal controls
+            modalClose.addEventListener('click', closeModal);
+            modalCancel.addEventListener('click', closeModal);
+            
+            // Withdraw button
+            if (withdrawBtn) {
+                withdrawBtn.addEventListener('click', function() {
+                    openModal('withdraw', 'Withdraw Funds', 
+                        'This is a preview of the withdrawal process. You would transfer your earnings to your preferred payment method.',
+                        'Withdraw');
+                });
+            }
+
+            // Close modal when clicking outside
+            window.addEventListener('click', function(event) {
+                if (event.target === modal) {
+                    closeModal();
+                }
+            });
+        }
+        
+        function addCardEventListeners() {
+            // Add event listeners to survey buttons
+            document.querySelectorAll('.btn[data-type="survey"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const surveyId = this.getAttribute('data-id');
+                    const survey = surveyData.find(s => s.id == surveyId);
+                    
+                    openModal('survey', survey.title, 
+                        `This is a preview of the "${survey.title}" experience. Completing it would earn you ${survey.reward} coins.`,
+                        'Start Survey', survey.reward);
+                });
+            });
+            
+             // Add event listeners to offer buttons
+            document.querySelectorAll('.btn[data-type="offer"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const offerId = this.getAttribute('data-id');
+                    const offer = offerData.find(o => o.id == offerId);
+                    
+                    let actionText = '';
+                    switch(offer.action) {
+                        case 'install': actionText = 'install the app'; break;
+                        case 'register': actionText = 'register an account'; break;
+                        case 'complete': actionText = 'complete the tasks'; break;
+                        case 'subscribe': actionText = 'subscribe to the service'; break;
+                    }
+                    
+                    openModal('offer', offer.title, 
+                        `This is a preview. You would ${actionText} to earn ${offer.reward} coins.`,
+                        'Continue', offer.reward);
+                });
+            });
+        }
+
+        // Generate star rating HTML
+        function generateStars(rating) {
+            let stars = '';
+            const fullStars = Math.floor(rating);
+            const hasHalfStar = rating % 1 !== 0;
+            
+            for (let i = 0; i < fullStars; i++) { stars += '<i class="fas fa-star"></i>'; }
+            if (hasHalfStar) { stars += '<i class="fas fa-star-half-alt"></i>'; }
+            
+            const emptyStars = 5 - Math.ceil(rating);
+            for (let i = 0; i < emptyStars; i++) { stars += '<i class="far fa-star"></i>'; }
+            
+            return stars;
+        }
+
+        // Render survey cards
+        function renderSurveys(category) {
+            const container = document.getElementById('surveys-container');
+            container.innerHTML = '';
+
+            const filteredSurveys = surveyData.filter(survey => category === 'all' || survey.category === category);
+
+            filteredSurveys.forEach((survey, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${survey.title}</div>
+                        <div class="reward-badge">
+                            <i class="fas fa-coins"></i>
+                            <span class="reward-text">${survey.reward}</span>
+                        </div>
+                    </div>
+                    <div class="card-details">
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>${survey.time}</span>
+                        </div>
+                        <div class="detail-item">
+                            <div class="stars">${generateStars(survey.rating)}</div>
+                            <span>(${survey.rating})</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="category-tag">${survey.category}</div>
+                        <button class="btn" data-id="${survey.id}" data-type="survey">Apply</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+            addCardEventListeners();
+        }
+
+        // Render offer cards
+        function renderOffers() {
+            const container = document.getElementById('offers-container');
+            container.innerHTML = '';
+            
+            offerData.forEach((offer, index) => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.style.animationDelay = `${index * 0.1}s`;
+                
+                const actions = {
+                    install: { text: 'Install the app to earn', btn: 'Install' },
+                    register: { text: 'Register an account to earn', btn: 'Register' },
+                    complete: { text: 'Complete tasks to earn', btn: 'Start' },
+                    subscribe: { text: 'Subscribe to service to earn', btn: 'Subscribe' }
+                };
+                const actionInfo = actions[offer.action];
+                
+                card.innerHTML = `
+                    <div class="card-header">
+                        <div class="card-title">${offer.title}</div>
+                        <div class="reward-badge">
+                            <i class="fas fa-coins"></i>
+                            <span class="reward-text">${offer.reward}</span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <div class="offer-action">${actionInfo.text}</div>
+                        <button class="btn" data-id="${offer.id}" data-type="offer">${actionInfo.btn}</button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+             addCardEventListeners();
+        }
+
+        // Render transaction history
+        function renderHistory() {
+            const container = document.getElementById('history-container');
+            container.innerHTML = '';
+            
+            transactionHistory.forEach(transaction => {
+                const item = document.createElement('div');
+                item.className = 'history-item';
+                
+                item.innerHTML = `
+                    <div class="history-info">
+                        <div class="history-description">${transaction.description}</div>
+                        <div class="history-date">${transaction.date}</div>
+                    </div>
+                    <div class="history-amount ${transaction.type}">
+                        ${transaction.type === 'earned' ? '+' : '-'}${transaction.amount}
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // Update balance display
+        function updateBalance() {
+            const total = transactionHistory.reduce((acc, t) => {
+                return t.type === 'earned' ? acc + t.amount : acc - t.amount;
+            }, 0);
+            balanceAmount.textContent = total.toLocaleString();
+        }
+
+        // Open modal with specific content
+        function openModal(type, title, text, actionText, amount = 0) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-text').textContent = text;
+            const actionBtn = document.getElementById('modal-action');
+            actionBtn.textContent = actionText;
+            modal.style.display = 'flex';
+            
+            // Re-clone the button to remove old event listeners
+            const newActionBtn = actionBtn.cloneNode(true);
+            actionBtn.parentNode.replaceChild(newActionBtn, actionBtn);
+            
+            // Add the new event listener
+            newActionBtn.addEventListener('click', function() {
+                if (type === 'survey' || type === 'offer') {
+                    const newTransaction = {
+                        id: transactionHistory.length + 1,
+                        type: 'earned',
+                        amount: amount,
+                        description: title,
+                        date: new Date().toISOString().split('T')[0]
+                    };
+                    transactionHistory.unshift(newTransaction);
+                } else if (type === 'withdraw') {
+                     const currentBalance = parseInt(balanceAmount.textContent.replace(/,/g, ''));
+                    if (currentBalance >= 100) {
+                         const newTransaction = {
+                            id: transactionHistory.length + 1,
+                            type: 'withdrawn',
+                            amount: 100,
+                            description: 'Cash Withdrawal',
+                            date: new Date().toISOString().split('T')[0]
+                        };
+                        transactionHistory.unshift(newTransaction);
+                    } else {
+                        alert('Insufficient balance for withdrawal.');
+                    }
+                }
+                renderHistory();
+                updateBalance();
+                closeModal();
+            });
+        }
+
+        // Close modal
+        function closeModal() {
+            modal.style.display = 'none';
+        }
+    </script>
+</body>
+</html>
